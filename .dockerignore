@@ -1,0 +1,6 @@
+.git
+.DS_Store
+__pycache__/
+data/
+output/
+submission.zip
