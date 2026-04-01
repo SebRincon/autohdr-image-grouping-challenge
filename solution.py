@@ -240,7 +240,10 @@ def candidate_pairs_exact(features: list[ImageFeatures]) -> list[list[tuple[floa
     candidates: list[list[tuple[float, int]]] = [[] for _ in features]
     for idx in range(len(features)):
         row = similarity[idx]
-        shortlist = np.argpartition(row, -MAX_CANDIDATES_PER_IMAGE)[-MAX_CANDIDATES_PER_IMAGE:]
+        shortlist_size = min(MAX_CANDIDATES_PER_IMAGE, len(features) - 1)
+        if shortlist_size <= 0:
+            continue
+        shortlist = np.argpartition(row, -shortlist_size)[-shortlist_size:]
         shortlist = shortlist[np.argsort(row[shortlist])[::-1]]
         candidates[idx] = [
             (float(row[other_idx]), int(other_idx))
@@ -307,7 +310,7 @@ def orb_inlier_stats(left: ImageFeatures, right: ImageFeatures) -> tuple[int, in
 
     matcher = cv2.BFMatcher(cv2.NORM_HAMMING)
     knn = matcher.knnMatch(left.orb_desc, right.orb_desc, k=2)
-    good = [m for m, n in knn if m.distance < RATIO_TEST * n.distance]
+    good = [pair[0] for pair in knn if len(pair) == 2 and pair[0].distance < RATIO_TEST * pair[1].distance]
     if len(good) < 4:
         return len(good), 0, 0.0
 
