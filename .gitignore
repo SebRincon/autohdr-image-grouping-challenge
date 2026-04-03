@@ -1,5 +1,6 @@
 data/
 output/
 submission.zip
+submission-singleton.zip
 .DS_Store
 __pycache__/
